@@ -128,9 +128,6 @@ all.config
 # fetched Android config fragments
 kernel/configs/android-*.cfg
 
-# Qualcomm out-of-tree audio drivers
-/techpack/audio
-
 #
 #Ignoring Android.bp link file
 #
