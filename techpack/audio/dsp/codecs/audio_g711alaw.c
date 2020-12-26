@@ -223,8 +223,10 @@ static int audio_open(struct inode *inode, struct file *file)
 {
 	struct q6audio_aio *audio = NULL;
 	int rc = 0;
+#ifdef CONFIG_DEBUG_FS
 	/* 4 bytes represents decoder number, 1 byte for terminate string */
 	char name[sizeof "msm_g711_" + 5];
+#endif
 
 	audio = kzalloc(sizeof(struct q6audio_aio), GFP_KERNEL);
 
@@ -288,6 +290,7 @@ static int audio_open(struct inode *inode, struct file *file)
 		goto fail;
 	}
 
+#ifdef CONFIG_DEBUG_FS
 	snprintf(name, sizeof(name), "msm_g711_%04x", audio->ac->session);
 #ifdef CONFIG_DEBUG_FS
 	audio->dentry = config_debugfs_create_file(name, (void *)audio);
