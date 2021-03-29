@@ -320,8 +320,6 @@ static void add_dmabuf_list(struct kgsl_dma_buf_meta *meta)
 		list_add(&dle->node, &kgsl_dmabuf_list);
 		meta->dle = dle;
 		list_add(&meta->node, &dle->dmabuf_list);
-		kgsl_trace_gpu_mem_total(meta->device,
-				 meta->entry->memdesc.size);
 	}
 	spin_unlock(&kgsl_dmabuf_lock);
 }
@@ -338,8 +336,6 @@ static void remove_dmabuf_list(struct kgsl_dma_buf_meta *meta)
 	if (list_empty(&dle->dmabuf_list)) {
 		list_del(&dle->node);
 		kfree(dle);
-		kgsl_trace_gpu_mem_total(meta->device,
-				-(meta->entry->memdesc.size));
 	}
 	spin_unlock(&kgsl_dmabuf_lock);
 }
@@ -367,10 +363,11 @@ static void kgsl_destroy_ion(struct kgsl_memdesc *memdesc)
 	 */
 	memdesc->sgt = NULL;
 }
+#else
+static void kgsl_destroy_ion(struct kgsl_dma_buf_meta *meta)
+{
 
-static struct kgsl_memdesc_ops kgsl_dmabuf_ops = {
-	.free = kgsl_destroy_ion,
-};
+}
 #endif
 
 static void kgsl_destroy_anon(struct kgsl_memdesc *memdesc)
@@ -423,7 +420,40 @@ kgsl_mem_entry_destroy(struct kref *kref)
 		atomic_long_sub(entry->memdesc.size,
 			&kgsl_driver.stats.mapped);
 
+	/*
+	 * Ion takes care of freeing the sg_table for us so
+	 * clear the sg table before freeing the sharedmem
+	 * so kgsl_sharedmem_free doesn't try to free it again
+	 */
+	if (memtype == KGSL_MEM_ENTRY_ION)
+		entry->memdesc.sgt = NULL;
+
+	if ((memtype == KGSL_MEM_ENTRY_USER)
+		&& !(entry->memdesc.flags & KGSL_MEMFLAGS_GPUREADONLY)) {
+		int i = 0, j;
+		struct scatterlist *sg;
+		struct page *page;
+		/*
+		 * Mark all of pages in the scatterlist as dirty since they
+		 * were writable by the GPU.
+		 */
+		for_each_sg(entry->memdesc.sgt->sgl, sg,
+			    entry->memdesc.sgt->nents, i) {
+			page = sg_page(sg);
+			for (j = 0; j < (sg->length >> PAGE_SHIFT); j++)
+				set_page_dirty_lock(nth_page(page, j));
+		}
+	}
+
 	kgsl_sharedmem_free(&entry->memdesc);
+
+	switch (memtype) {
+	case KGSL_MEM_ENTRY_ION:
+		kgsl_destroy_ion(entry->priv_data);
+		break;
+	default:
+		break;
+	}
 
 	kfree(entry);
 }
