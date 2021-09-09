@@ -726,8 +726,18 @@ static void pe_shutdown_notifier_cb(void *ctx)
 }
 
 #ifdef WLAN_FEATURE_11W
-bool is_mgmt_protected(uint32_t vdev_id,
-		       const uint8_t *peer_mac_addr)
+/**
+ * is_mgmt_protected - check RMF enabled for the peer
+ * @vdev_id: vdev id
+ * @peer_mac_addr: peer mac address
+ *
+ * The function check the mgmt frame protection enabled or not
+ * for station mode and AP mode
+ *
+ * Return: true, if the connection is RMF enabled.
+ */
+static bool is_mgmt_protected(uint32_t vdev_id,
+				  const uint8_t *peer_mac_addr)
 {
 	uint16_t aid;
 	tpDphHashNode sta_ds;
@@ -1222,15 +1232,12 @@ static bool pe_filter_bcn_probe_frame(tpAniSirGlobal mac_ctx,
 
 		ssid_ie = wlan_get_ie_ptr_from_eid(SIR_MAC_SSID_EID,
 				body + SIR_MAC_B_PR_SSID_OFFSET,
-				frame_len - SIR_MAC_B_PR_SSID_OFFSET);
+				frame_len);
 
 		if (!ssid_ie)
 			return false;
 
 		bcn_ssid.length = ssid_ie[1];
-		if (bcn_ssid.length > WLAN_SSID_MAX_LEN)
-			return false;
-
 		qdf_mem_copy(&bcn_ssid.ssId,
 			     &ssid_ie[2],
 			     bcn_ssid.length);
@@ -2220,7 +2227,6 @@ lim_roam_fill_bss_descr(tpAniSirGlobal pMac,
 				sizeof(bss_desc_ptr->length) + ie_len);
 
 	bss_desc_ptr->fProbeRsp = !roam_offload_synch_ind_ptr->isBeacon;
-	bss_desc_ptr->rssi = roam_offload_synch_ind_ptr->rssi;
 	/* Copy Timestamp */
 	bss_desc_ptr->scansystimensec = qdf_get_monotonic_boottime_ns();
 	if (parsed_frm_ptr->dsParamsPresent) {
@@ -2248,25 +2254,17 @@ lim_roam_fill_bss_descr(tpAniSirGlobal pMac,
 	qdf_mem_copy(&bss_desc_ptr->capabilityInfo,
 	&bcn_proberesp_ptr[SIR_MAC_HDR_LEN_3A + SIR_MAC_B_PR_CAPAB_OFFSET], 2);
 
-	/*
-	 * overwrite the BSSID with the firmware provided BSSID as some buggy
-	 * AP's are not sending correct BSSID in probe resp
-	 */
-	pe_debug("bssid is %pM in beacon/probe update it with bssId %pM in sync ind",
-		 mac_hdr->bssId, roam_offload_synch_ind_ptr->bssid.bytes);
-
-	qdf_mem_copy(mac_hdr->bssId,
-		     roam_offload_synch_ind_ptr->bssid.bytes,
-		     sizeof(tSirMacAddr));
+	if (qdf_is_macaddr_zero((struct qdf_mac_addr *)mac_hdr->bssId)) {
+		pe_debug("bssid is 0 in beacon/probe update it with bssId %pM in sync ind",
+			roam_offload_synch_ind_ptr->bssid.bytes);
+		qdf_mem_copy(mac_hdr->bssId,
+			roam_offload_synch_ind_ptr->bssid.bytes,
+			sizeof(tSirMacAddr));
+	}
 
 	qdf_mem_copy((uint8_t *) &bss_desc_ptr->bssId,
-		     (uint8_t *) mac_hdr->bssId,
-		     sizeof(tSirMacAddr));
-
-	qdf_mem_copy((uint8_t *)&bss_desc_ptr->seq_ctrl,
-		     (uint8_t *)&mac_hdr->seqControl,
-		     sizeof(tSirMacSeqCtl));
-
+			(uint8_t *) mac_hdr->bssId,
+			sizeof(tSirMacAddr));
 	bss_desc_ptr->received_time =
 		      (uint64_t)qdf_mc_timer_get_system_time();
 	if (parsed_frm_ptr->mdiePresent) {

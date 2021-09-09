@@ -6,8 +6,6 @@ else
 	KERNEL_BUILD := n
 endif
 
-TARGET_BUILD_VARIANT := user
-
 ifeq ($(KERNEL_BUILD), y)
 	# These are provided in external module based builds
 	# Need to explicitly define for Kernel-based builds
@@ -37,10 +35,10 @@ HDD_DIR :=	core/hdd
 HDD_INC_DIR :=	$(HDD_DIR)/inc
 HDD_SRC_DIR :=	$(HDD_DIR)/src
 
-HDD_INC := 	-I$(WLAN_ROOT)/$(HDD_INC_DIR) \
+HDD_INC :=	-I$(WLAN_ROOT)/$(HDD_INC_DIR) \
 		-I$(WLAN_ROOT)/$(HDD_SRC_DIR)
 
-HDD_OBJS := 	$(HDD_SRC_DIR)/wlan_hdd_assoc.o \
+HDD_OBJS :=	$(HDD_SRC_DIR)/wlan_hdd_assoc.o \
 		$(HDD_SRC_DIR)/wlan_hdd_cfg.o \
 		$(HDD_SRC_DIR)/wlan_hdd_cfg80211.o \
 		$(HDD_SRC_DIR)/wlan_hdd_data_stall_detection.o \
@@ -192,7 +190,7 @@ EPPING_DIR :=	$(WLAN_COMMON_ROOT)/utils/epping
 EPPING_INC_DIR :=	$(EPPING_DIR)/inc
 EPPING_SRC_DIR :=	$(EPPING_DIR)/src
 
-EPPING_INC := 	-I$(WLAN_ROOT)/$(EPPING_INC_DIR)
+EPPING_INC :=	-I$(WLAN_ROOT)/$(EPPING_INC_DIR)
 
 EPPING_OBJS := $(EPPING_SRC_DIR)/epping_main.o \
 		$(EPPING_SRC_DIR)/epping_txrx.o \
@@ -206,7 +204,7 @@ MAC_DIR :=	core/mac
 MAC_INC_DIR :=	$(MAC_DIR)/inc
 MAC_SRC_DIR :=	$(MAC_DIR)/src
 
-MAC_INC := 	-I$(WLAN_ROOT)/$(MAC_INC_DIR) \
+MAC_INC :=	-I$(WLAN_ROOT)/$(MAC_INC_DIR) \
 		-I$(WLAN_ROOT)/$(MAC_SRC_DIR)/dph \
 		-I$(WLAN_ROOT)/$(MAC_SRC_DIR)/include \
 		-I$(WLAN_ROOT)/$(MAC_SRC_DIR)/pe/include \
@@ -283,7 +281,7 @@ MAC_SCH_OBJS := $(MAC_SRC_DIR)/pe/sch/sch_api.o \
 
 MAC_RRM_OBJS :=	$(MAC_SRC_DIR)/pe/rrm/rrm_api.o
 
-MAC_OBJS := 	$(MAC_CFG_OBJS) \
+MAC_OBJS :=	$(MAC_CFG_OBJS) \
 		$(MAC_DPH_OBJS) \
 		$(MAC_LIM_OBJS) \
 		$(MAC_SCH_OBJS) \
@@ -295,7 +293,7 @@ SAP_DIR :=	core/sap
 SAP_INC_DIR :=	$(SAP_DIR)/inc
 SAP_SRC_DIR :=	$(SAP_DIR)/src
 
-SAP_INC := 	-I$(WLAN_ROOT)/$(SAP_INC_DIR) \
+SAP_INC :=	-I$(WLAN_ROOT)/$(SAP_INC_DIR) \
 		-I$(WLAN_ROOT)/$(SAP_SRC_DIR)
 
 SAP_OBJS :=	$(SAP_SRC_DIR)/sap_api_link_cntl.o \
@@ -357,7 +355,7 @@ SME_DIR :=	core/sme
 SME_INC_DIR :=	$(SME_DIR)/inc
 SME_SRC_DIR :=	$(SME_DIR)/src
 
-SME_INC := 	-I$(WLAN_ROOT)/$(SME_INC_DIR) \
+SME_INC :=	-I$(WLAN_ROOT)/$(SME_INC_DIR) \
 		-I$(WLAN_ROOT)/$(SME_SRC_DIR)/csr
 
 SME_CSR_OBJS := $(SME_SRC_DIR)/csr/csr_api_roam.o \
@@ -402,7 +400,7 @@ NLINK_DIR     :=	$(WLAN_COMMON_ROOT)/utils/nlink
 NLINK_INC_DIR :=	$(NLINK_DIR)/inc
 NLINK_SRC_DIR :=	$(NLINK_DIR)/src
 
-NLINK_INC     := 	-I$(WLAN_ROOT)/$(NLINK_INC_DIR)
+NLINK_INC     :=	-I$(WLAN_ROOT)/$(NLINK_INC_DIR)
 NLINK_OBJS    :=	$(NLINK_SRC_DIR)/wlan_nlink_srv.o
 
 ############ PTT ############
@@ -410,7 +408,7 @@ PTT_DIR     :=	$(WLAN_COMMON_ROOT)/utils/ptt
 PTT_INC_DIR :=	$(PTT_DIR)/inc
 PTT_SRC_DIR :=	$(PTT_DIR)/src
 
-PTT_INC     := 	-I$(WLAN_ROOT)/$(PTT_INC_DIR)
+PTT_INC     :=	-I$(WLAN_ROOT)/$(PTT_INC_DIR)
 PTT_OBJS    :=	$(PTT_SRC_DIR)/wlan_ptt_sock_svc.o
 
 ############ WLAN_LOGGING ############
@@ -425,7 +423,7 @@ WLAN_LOGGING_OBJS    := $(WLAN_LOGGING_SRC_DIR)/wlan_logging_sock_svc.o \
 ############ SYS ############
 SYS_DIR :=	core/mac/src/sys
 
-SYS_INC := 	-I$(WLAN_ROOT)/$(SYS_DIR)/common/inc \
+SYS_INC :=	-I$(WLAN_ROOT)/$(SYS_DIR)/common/inc \
 		-I$(WLAN_ROOT)/$(SYS_DIR)/legacy/src/platform/inc \
 		-I$(WLAN_ROOT)/$(SYS_DIR)/legacy/src/system/inc \
 		-I$(WLAN_ROOT)/$(SYS_DIR)/legacy/src/utils/inc
@@ -452,7 +450,7 @@ QDF_LINUX_OBJ_DIR := $(WLAN_COMMON_ROOT)/$(QDF_OS_LINUX_SRC_DIR)
 QDF_INC :=	-I$(WLAN_COMMON_INC)/$(QDF_OS_INC_DIR) \
 		-I$(WLAN_COMMON_INC)/$(QDF_OS_LINUX_SRC_DIR)
 
-QDF_OBJS := 	$(QDF_LINUX_OBJ_DIR)/qdf_defer.o \
+QDF_OBJS :=	$(QDF_LINUX_OBJ_DIR)/qdf_defer.o \
 		$(QDF_LINUX_OBJ_DIR)/qdf_event.o \
 		$(QDF_LINUX_OBJ_DIR)/qdf_file.o \
 		$(QDF_LINUX_OBJ_DIR)/qdf_list.o \
@@ -497,7 +495,7 @@ WBUFF_OBJ_DIR := $(WLAN_COMMON_ROOT)/$(WBUFF_OS_SRC_DIR)
 WBUFF_INC :=	-I$(WLAN_COMMON_INC)/$(WBUFF_OS_INC_DIR) \
 
 ifeq ($(CONFIG_WLAN_WBUFF), y)
-WBUFF_OBJS += 	$(WBUFF_OBJ_DIR)/wbuff.o
+WBUFF_OBJS +=	$(WBUFF_OBJ_DIR)/wbuff.o
 endif
 
 ##########OS_IF #######
@@ -624,7 +622,7 @@ CDS_DIR :=	core/cds
 CDS_INC_DIR :=	$(CDS_DIR)/inc
 CDS_SRC_DIR :=	$(CDS_DIR)/src
 
-CDS_INC := 	-I$(WLAN_ROOT)/$(CDS_INC_DIR) \
+CDS_INC :=	-I$(WLAN_ROOT)/$(CDS_INC_DIR) \
 		-I$(WLAN_ROOT)/$(CDS_SRC_DIR)
 
 CDS_OBJS :=	$(CDS_SRC_DIR)/cds_api.o \
@@ -1407,7 +1405,7 @@ INCS +=		$(HIF_INC) \
 		$(BMI_INC)
 
 ifeq ($(CONFIG_LITHIUM), y)
-INCS += 	$(HAL_INC) \
+INCS +=		$(HAL_INC) \
 		$(DP_INC)
 endif
 
@@ -1490,7 +1488,7 @@ OBJS +=		$(HIF_OBJS) \
 		$(GLOBAL_LMAC_IF_OBJ)
 
 ifeq ($(CONFIG_LITHIUM), y)
-OBJS += 	$(HAL_OBJS)
+OBJS +=		$(HAL_OBJS)
 endif
 
 ifeq ($(CONFIG_FEATURE_FW_LOG_PARSING), y)
@@ -1498,7 +1496,7 @@ OBJS +=        $(FWLOG_OBJS)
 endif
 
 ifeq ($(CONFIG_FEATURE_EPPING), y)
-OBJS += 	$(EPPING_OBJS)
+OBJS +=		$(EPPING_OBJS)
 endif
 
 ifeq ($(CONFIG_WLAN_DFS_MASTER_ENABLE), y)
